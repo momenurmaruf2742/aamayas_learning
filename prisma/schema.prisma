@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String
+  ageGroup  String   // e.g., "4-7 years", "8-11 years"
+  image     String?  // URL to image
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  topics    Topic[]
+}
+
+model Topic {
+  id         String      @id @default(uuid())
+  name       String
+  image      String?
+  categoryId String
+  category   Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  cards      Flashcard[]
+}
+
+model Flashcard {
+  id           String   @id @default(uuid())
+  frontContent String   // Could be text or markdown
+  frontImage   String?  // Optional image for front
+  backContent  String   // Text/Markdown for back
+  backImage    String?  // Optional image for back
+  topicId      String
+  topic        Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
