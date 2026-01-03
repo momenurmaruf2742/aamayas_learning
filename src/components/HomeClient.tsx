@@ -50,6 +50,26 @@ export default function HomeClient({ categories }: { categories: any[] }) {
         }
     };
 
+    // Dynamic Gradients for Topics
+    const GRADIENTS = [
+        'from-red-500 via-rose-500 to-orange-500',
+        'from-blue-600 via-cyan-500 to-teal-500',
+        'from-purple-600 via-fuchsia-500 to-pink-500',
+        'from-emerald-500 via-teal-500 to-green-500',
+        'from-indigo-600 via-violet-600 to-blue-600',
+        'from-orange-500 via-amber-500 to-yellow-500',
+        'from-pink-600 via-rose-500 to-red-500',
+        'from-slate-800 via-slate-700 to-slate-900',
+    ];
+
+    const getGradient = (id: string) => {
+        let hash = 0;
+        for (let i = 0; i < id.length; i++) {
+            hash = id.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return GRADIENTS[Math.abs(hash) % GRADIENTS.length];
+    };
+
     return (
         <div className="min-h-screen font-sans font-feature-settings-ss01 selection:bg-red-500 selection:text-white">
             {/* ... Header ... */}
@@ -282,7 +302,7 @@ export default function HomeClient({ categories }: { categories: any[] }) {
                                 className="relative h-[320px] rounded-[48px] overflow-hidden group shadow-2xl shadow-red-900/10"
                             >
                                 {/* Animated Gradient Background */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-red-500 via-rose-500 to-orange-500 animate-gradient bg-[length:200%_200%]"></div>
+                                <div className={`absolute inset-0 bg-gradient-to-r ${getGradient(activeTopic.id)} animate-gradient bg-[length:200%_200%]`}></div>
                                 <div className="absolute inset-0 bg-noise opacity-20"></div>
 
                                 {/* Decor */}
