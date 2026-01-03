@@ -12,9 +12,10 @@ interface FlashCardProps {
         image?: string;
     };
     color?: string;
+    variant?: 'standard' | 'high-contrast';
 }
 
-export default function FlashCard({ card, color = 'bg-red-500' }: FlashCardProps) {
+export default function FlashCard({ card, color = 'bg-red-500', variant = 'standard' }: FlashCardProps) {
     const [isFlipped, setIsFlipped] = useState(false);
 
     // Tilt Animation Setup
@@ -43,6 +44,48 @@ export default function FlashCard({ card, color = 'bg-red-500' }: FlashCardProps
         x.set(0);
         y.set(0);
     };
+
+    if (variant === 'high-contrast') {
+        return (
+            <motion.div
+                className="perspective-1000 w-full h-[450px] cursor-pointer group"
+                onClick={() => setIsFlipped(!isFlipped)}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                style={{ perspective: 1000 }}
+            >
+                <motion.div
+                    className="w-full h-full relative transform-style-3d transition-all duration-700"
+                    animate={{ rotateY: isFlipped ? 180 : 0 }}
+                    transition={{ duration: 0.6, type: "spring", stiffness: 260, damping: 20 }}
+                >
+                    {/* --- FRONT SIDE (High Contrast) --- */}
+                    <div className="absolute inset-0 backface-hidden rounded-[20px] bg-white border-[8px] border-black flex flex-col items-center justify-center p-8">
+                        {card.frontContent.startsWith('http') ? (
+                            <img
+                                src={card.frontContent}
+                                alt={card.frontContent}
+                                className="w-64 h-64 object-contain grayscale contrast-200"
+                            />
+                        ) : (
+                            <div className="text-[120px] font-black text-black leading-none tracking-tighter">
+                                {card.frontContent}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* --- BACK SIDE (High Contrast Inverse) --- */}
+                    <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-[20px] bg-black border-[8px] border-white flex flex-col items-center justify-center p-8 text-center">
+                        <div className="text-4xl font-bold text-white mb-4 font-mono">{card.backContent.split('\n')[0]}</div>
+                        <div className="w-32 h-2 bg-white rounded-full mb-6"></div>
+                        <div className="text-xl text-zinc-300 font-medium max-w-xs leading-relaxed">
+                            {card.frontContent}
+                        </div>
+                    </div>
+                </motion.div>
+            </motion.div>
+        );
+    }
 
     return (
         <motion.div

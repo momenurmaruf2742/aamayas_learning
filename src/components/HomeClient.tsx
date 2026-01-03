@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { ShoppingCart, Search, Printer, Menu, Plus, Minus, Truck, ShieldCheck, Clock, BookOpen, Star, Heart, Check, Layout } from 'lucide-react';
+import { useState, useMemo, useRef } from 'react';
+import { ShoppingCart, Search, Printer, Menu, Plus, Minus, Truck, ShieldCheck, Clock, BookOpen, Star, Heart, Check, Layout, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import FlashCard from './FlashCard';
@@ -35,10 +35,26 @@ export default function HomeClient({ categories }: { categories: any[] }) {
 
     const cards = activeTopic?.cards || [];
 
+
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    const scroll = (direction: 'left' | 'right') => {
+        if (scrollContainerRef.current) {
+            const { current } = scrollContainerRef;
+            const scrollAmount = 300; // Scroll width of approx 2 items
+            if (direction === 'left') {
+                current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
+    };
+
     return (
         <div className="min-h-screen font-sans font-feature-settings-ss01 selection:bg-red-500 selection:text-white">
-            {/* Header */}
+            {/* ... Header ... */}
             <header className="bg-white/80 backdrop-blur-xl border-b border-gray-200/50 sticky top-0 z-50 shadow-sm transition-all duration-300 supports-[backdrop-filter]:bg-white/60">
+                {/* ... (Header content same as before) ... */}
                 <div className="max-w-[1700px] mx-auto px-6 py-4 flex justify-between items-center">
                     <div className="flex items-center space-x-4">
                         <div className="bg-gradient-to-br from-red-500 to-red-600 p-3 rounded-2xl shadow-lg shadow-red-500/20 ring-4 ring-red-50">
@@ -82,6 +98,7 @@ export default function HomeClient({ categories }: { categories: any[] }) {
 
                 {/* LEFT SIDEBAR - Stickied */}
                 <aside className="lg:col-span-3 space-y-8 lg:sticky lg:top-32 h-fit">
+                    {/* ... (Sidebar same as before) ... */}
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -151,6 +168,7 @@ export default function HomeClient({ categories }: { categories: any[] }) {
                         transition={{ delay: 0.1 }}
                         className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-[32px] p-8 text-white relative overflow-hidden shadow-2xl shadow-slate-900/20"
                     >
+                        {/* ... benefits content ... */}
                         <div className="absolute top-0 right-0 p-32 bg-blue-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
                         <h3 className="text-lg font-black uppercase tracking-widest mb-6 flex items-center gap-2">
                             <ShieldCheck className="w-5 h-5 text-emerald-400" /> Benefits
@@ -177,9 +195,25 @@ export default function HomeClient({ categories }: { categories: any[] }) {
                 <div className="lg:col-span-9 space-y-10">
 
                     {/* Categories Navigation */}
-                    <div className="flex items-start gap-8 border-b border-gray-200/50 pb-8 overflow-hidden">
-                        <div className="flex-shrink-0 pt-2 text-xs font-bold text-slate-400 uppercase tracking-widest">Collections</div>
-                        <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar mask-gradient-right w-full">
+                    <div className="relative group/nav">
+                        {/* Title */}
+                        <div className="flex items-center justify-between mb-4 px-1">
+                            <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Collections</div>
+                            <div className="flex gap-2">
+                                <button onClick={() => scroll('left')} className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm border border-slate-100 hover:bg-slate-50 hover:border-slate-300 transition-all">
+                                    <ChevronLeft className="w-4 h-4 text-slate-600" />
+                                </button>
+                                <button onClick={() => scroll('right')} className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm border border-slate-100 hover:bg-slate-50 hover:border-slate-300 transition-all">
+                                    <ChevronRight className="w-4 h-4 text-slate-600" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Scroll Container */}
+                        <div
+                            ref={scrollContainerRef}
+                            className="flex gap-4 overflow-x-auto pb-4 no-scrollbar mask-gradient-right w-full scroll-smooth"
+                        >
                             {categories.map((category: any) => {
                                 const isActive = activeCategoryId === category.id;
                                 return (
@@ -209,6 +243,7 @@ export default function HomeClient({ categories }: { categories: any[] }) {
                     </div>
 
                     {/* Topic Pills */}
+
                     {topics.length > 0 && (
                         <div className="flex items-center gap-4 overflow-x-auto pb-2 no-scrollbar">
                             {topics.map((topic: any) => {
@@ -308,7 +343,15 @@ export default function HomeClient({ categories }: { categories: any[] }) {
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.05 }}
                             >
-                                <FlashCard card={card} color="bg-red-500" />
+                                <FlashCard
+                                    card={card}
+                                    color="bg-red-500"
+                                    variant={
+                                        (activeCategory?.name.includes('0-2') || activeCategory?.name.includes('infant') || activeTopic?.name.includes('Contrast'))
+                                            ? 'high-contrast'
+                                            : 'standard'
+                                    }
+                                />
                             </motion.div>
                         ))}
                     </div>

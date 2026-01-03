@@ -143,11 +143,24 @@ body {
 }
 
 @media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  nav,
+  footer,
   .no-print {
     display: none !important;
   }
 
-  body {
-    background: white !important;
+  .page-break-after-always {
+    page-break-after: always;
+    break-after: page;
   }
 }
